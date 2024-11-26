@@ -1,6 +1,4 @@
 from flask import request, redirect, url_for, render_template, session, flash
-from config import app, db
-from models import User, Post, Thread, Interest, Comment, Message, Conversation, ConversationParticipants
 import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
