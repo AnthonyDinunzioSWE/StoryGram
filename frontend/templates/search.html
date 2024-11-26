@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}
+Home - My Flask App
+{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen bg-gray-50 py-8 px-4 flex flex-col items-center justify-start">
+        <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl">
+            <!-- Page Header -->
+            <h1 class="text-4xl font-bold text-gray-800 text-center mb-6">Search for User Profiles</h1>
+
+            <!-- Display logged-in user info -->
+            <p class="text-gray-600 text-center mb-6">Welcome, <span class="text-blue-500 font-semibold">{{ user.username }}</span>!</p>
+
+            <!-- Search Form -->
+            <form method="POST" action="{{ url_for('search') }}" class="flex items-center space-x-3">
+                <input 
+                    type="text" 
+                    name="username" 
+                    class="flex-grow px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" 
+                    placeholder="Enter username to search..." 
+                    required
+                />
+                <button 
+                    type="submit" 
+                    class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                    Search
+                </button>
+            </form>
+
+            <!-- No Results Found Message -->
+            {% if search_results is none %}
+                <p class="text-center text-gray-600 mt-6">No results found. Please try again with a different search.</p>
+            {% else %}
+                {% if search_results|length == 0 %}
+                    <p class="text-center text-gray-600 mt-6">No users found matching "<span class="font-semibold">{{ request.form.get('username') }}</span>".</p>
+                {% else %}
+                    <!-- Search Results -->
+                    <h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4">Search Results:</h2>
+                    <ul class="space-y-4">
+                        {% for result in search_results %}
+                            <li class="bg-gray-100 shadow-md rounded-lg p-4 flex justify-between items-center">
+                                <span class="text-gray-800 font-medium">{{ result.username }}</span>
+                                <a 
+                                    href="{{ url_for('view_profile', user_id=result.id) }}" 
+                                    class="px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                >
+                                    View Profile
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

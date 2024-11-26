@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}dotCode{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='/css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+     <!-- Include TailwindCSS from CDN -->
+     <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <!-- Header -->
+<header class="bg-white shadow-md">
+    <nav class="max-w-7xl bg-white mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div class="navLogo">
+            <h3 class="text-2xl font-bold text-indigo-600">dotCode</h3>
+        </div>
+        <ul class="nav-links flex space-x-6">
+            {% if session.get("user_id") %}
+                <li class="nav-item">
+                    <a href="{{ url_for('home') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('home') %}text-2xl text-indigo-600{% endif %}">
+                        <i class="fa-solid fa-house"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('search') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('search') %}text-2xl text-indigo-600{% endif %}">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('messages') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('messages') %}text-2xl text-indigo-600{% endif %}">
+                        <i class="fa-solid fa-comments"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('profile') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('profile') %}text-2xl text-indigo-600{% endif %}">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('logout') }}" class="text-gray-700 hover:text-red-700">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a href="{{ url_for('home') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('home') %}text-2xl{% endif %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('signup') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('signup') %}text-2xl{% endif %}">Signup</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-indigo-600 {% if request.path == url_for('login') %}text-2xl{% endif %}">Login</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</header>
+    <main>
+        {% block content %}
+        <!-- Content will be injected here -->
+        {% endblock %}
+    </main>
+     <!-- Footer -->
+     <footer class="bg-white shadow-inner mt-8 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-gray-500">&copy; 2024 StoryGram. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+{% extends "base.html" %}
+
+{% block title %}
+View Profile - dotCode
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 sm:px-12 lg:px-24 py-12 bg-gray-50">
+    <!-- Profile Header Section -->
+    <div class="flex flex-col sm:flex-row items-center bg-white p-8 rounded-lg shadow-lg mb-12">
+        <!-- Profile Image -->
+        <div class="relative">
+            <img src="../static/images/uploads/{{ user.profile_image }}" alt="Profile Image"
+                 class="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-blue-500 shadow-lg">
+            <div class="absolute bottom-0 right-0 bg-blue-600 text-white text-sm py-1 px-2 rounded-full">
+                <i class="fas fa-camera"></i>
+            </div>
+        </div>
+
+        <div class="mt-6 sm:mt-0 sm:ml-12 text-center sm:text-left">
+            <h1 class="text-4xl font-bold text-gray-800">{{ user.username }}</h1>
+            <p class="text-lg text-gray-600 mt-2">{{ user.bio if user.bio else "No bio available." }}</p>
+
+            <div class="mt-4 flex justify-center sm:justify-start space-x-8">
+                <div>
+                    <p class="font-bold text-xl text-gray-800">{{ user.followers.count() }}</p>
+                    <p class="text-gray-500">Followers</p>
+                </div>
+                <div>
+                    <p class="font-bold text-xl text-gray-800">{{ user.following.count() }}</p>
+                    <p class="text-gray-500">Following</p>
+                </div>
+            </div>
+
+            <!-- Follow/Unfollow Button -->
+            <form method="POST" class="mt-6">
+                <button type="submit" class="inline-block bg-blue-600 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition">
+                    {% if is_following %}
+                        Unfollow
+                    {% else %}
+                        Follow
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="bg-white p-8 rounded-lg shadow-lg mb-12">
+        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Posts</h3>
+        {% for post in posts %}
+            <div class="bg-gray-100 shadow-md rounded-lg p-6 mb-6">
+                <h4 class="text-xl font-semibold text-gray-800">{{ post.title }}</h4>
+                <p class="text-gray-600 mt-2">{{ post.content }}</p>
+
+                <!-- Post Footer -->
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex items-center space-x-4">
+                        <!-- Like Counter -->
+                        <div class="flex items-center space-x-1 text-gray-600">
+                            <i class="fa fa-thumbs-up text-blue-600"></i>
+                            <span class="font-semibold">{{ post.like_counter }}</span>
+                        </div>
+                        <!-- Dislike Counter -->
+                        <div class="flex items-center space-x-1 text-gray-600">
+                            <i class="fa fa-thumbs-down text-red-600"></i>
+                            <span class="font-semibold">{{ post.dislike_counter }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Threads Section -->
+                <ul class="mt-6 space-y-4">
+                    {% for thread in post.threads %}
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <h5 class="text-lg font-semibold text-gray-800">{{ thread.title }}</h5>
+                            <p class="text-gray-600 mt-2">{{ thread.content }}</p>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <p class="text-lg text-gray-500">No posts available.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

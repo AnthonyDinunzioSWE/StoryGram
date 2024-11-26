@@ -1,0 +1,17 @@
+<!-- conversation.html -->
+<div class="conversation-header">
+    <img src="{{ conversation.get_other_participant(user.id).profile_image }}" alt="{{ conversation.get_other_participant(user.id).username }}" class="profile-img">
+    <h3>{{ conversation.get_other_participant(user.id).username }}</h3>
+</div>
+<div class="message-thread">
+    {% for message in conversation.messages %}
+        <div class="message {{ 'sent' if message.sender_id == user.id else 'received' }}">
+            <p>{{ message.content }}</p>
+            <span class="message-time">{{ message.timestamp.strftime('%H:%M') }}</span>
+        </div>
+    {% endfor %}
+</div>
+<form action="{{ url_for('send_message', conversation_id=conversation.id) }}" method="POST">
+    <textarea name="content" placeholder="Type your message..."></textarea>
+    <button type="submit">Send</button>
+</form>

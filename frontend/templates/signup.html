@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}
+Signup - StoryGram
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-400 via-green-500 to-teal-500">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+        <h1 class="text-3xl font-bold text-gray-800 text-center mb-4">Welcome to dotCode</h1>
+        <p class="text-gray-600 text-center mb-6">We're excited to have you as a new member!</p>
+
+        <!-- Flash Messages for Feedback -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="mb-4">
+                    <ul>
+                        {% for category, message in messages %}
+                            <li class="p-2 rounded text-white mb-2 text-center {% if category == 'error' %}bg-red-500{% else %}bg-green-500{% endif %}">
+                                {{ message }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Signup Form -->
+        <form method="POST" class="space-y-4">
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email:</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    placeholder="JohnSmith@gmail.com" 
+                    required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                />
+            </div>
+
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">Username:</label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    id="username" 
+                    placeholder="Username" 
+                    required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                />
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Password:</label>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    placeholder="Password" 
+                    required
+                    class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500"
+                />
+            </div>
+
+            <button 
+                type="submit" 
+                class="w-full py-2 px-4 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold rounded-lg shadow-md hover:from-green-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+                Signup
+            </button>
+        </form>
+
+        <p class="text-sm text-center text-gray-600 mt-4">
+            Already have an account? 
+            <a href="{{ url_for('login') }}" class="text-green-600 hover:underline">Login here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

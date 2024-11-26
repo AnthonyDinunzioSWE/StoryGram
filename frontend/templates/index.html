@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}
+Home - My Flask App
+{% endblock %}
+
+{% block content %}
+<h1>Welcome to StoryGram</h1>
+<p>This is the homepage. Feel free to explore!</p>
+
+<!-- Posts Section -->
+<div class="mb-12">
+    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Posts</h3>
+    {% for post in posts %}
+        <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+            <h4 class="text-xl font-semibold text-gray-800">{{ post.title }}</h4>
+            <p class="text-gray-600 mt-2">{{ post.content }}</p>
+
+            <!-- Post Author -->
+            <p class="text-sm text-gray-500">Author: {{ post.author.username }}</p>
+
+            {% if post.author.id != user.id %}
+                <!-- Actions for non-author users -->
+                <div class="flex items-center justify-between mt-4">
+                    <div class="flex items-center space-x-4">
+                        <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST">
+                            <button type="submit" class="text-gray-600">
+                                {% if user in post.likes %}
+                                    Unlike
+                                {% else %}
+                                    Like
+                                {% endif %}
+                            </button>
+                        </form>
+                        <form action="{{ url_for('dislike_post', post_id=post.id) }}" method="POST">
+                            <button type="submit" class="text-gray-600">
+                                {% if user in post.dislikes %}
+                                    Remove Dislike
+                                {% else %}
+                                    Dislike
+                                {% endif %}
+                            </button>
+                        </form>
+                        <a href="{{ url_for('add_comment', post_id=post.id) }}" class="text-gray-600">Add Comment</a>
+                        <a href="{{ url_for('thread_post', post_id=post.id) }}" class="text-gray-600">Create Thread</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Threads Section -->
+            <ul class="mt-6 space-y-4">
+                {% for thread in post.threads %}
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <h5 class="text-lg font-semibold text-gray-800">{{ thread.title }}</h5>
+                        <p class="text-gray-600 mt-2">{{ thread.content }}</p>
+                    </div>
+                {% endfor %}
+            </ul>
+
+            {% for comment in post.comments %}
+            <div class="comment-card">
+
+                <h4>{{ comment.author }}</h4>
+                <p>{{ comment.content }}</p>
+                <p>{{ comment.created_at }}</p>
+                
+
+            </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <p>No posts available.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}

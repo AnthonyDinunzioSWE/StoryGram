@@ -1,0 +1,25 @@
+<!-- messages.html -->
+<div class="flex-1 overflow-y-auto">
+    <div class="space-y-4 p-4">
+        {% for conversation in conversations %}
+        <div class="flex items-center p-3 bg-white rounded-lg shadow hover:bg-gray-50 cursor-pointer transition" 
+             onclick="window.location=`{{ url_for('conversation', conversation_id=conversation.id) }}`">
+            <img src="{{ conversation.get_other_participant(user.id).profile_image }}" 
+                 alt="{{ conversation.get_other_participant(user.id).username }}" 
+                 class="w-12 h-12 rounded-full object-cover">
+            <div class="flex-1 ml-3">
+                <h3 class="text-sm font-medium text-gray-900">{{ conversation.get_other_participant(user.id).username }}</h3>
+                <p class="text-xs text-gray-500 truncate">
+                    {{ conversation.messages[-1].content[:50] }}...
+                </p>
+            </div>
+            <div class="flex flex-col items-end space-y-1">
+                <span class="text-xs text-gray-400">{{ conversation.messages[-1].timestamp.strftime('%H:%M') }}</span>
+                {% if not conversation.messages[-1].is_read and conversation.messages[-1].sender_id != user.id %}
+                <span class="w-2.5 h-2.5 bg-blue-500 rounded-full"></span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>

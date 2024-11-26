@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- select_participants.html -->
+<div class="flex flex-col h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
+        <a href="{{ url_for('profile') }}" class="flex items-center">
+            <img src="{{ user.profile_image }}" alt="{{ user.username }}" 
+                 class="w-10 h-10 rounded-full object-cover">
+        </a>
+        <h2 class="text-lg font-semibold text-gray-800">Select Participants</h2>
+    </div>
+
+    <!-- Participants Selection Form -->
+    <form method="POST" class="flex-1 overflow-y-auto p-4">
+        <div class="space-y-4">
+            <label for="participants" class="text-sm font-semibold text-gray-700">Select Participants</label>
+            <select id="participants" name="participants" multiple class="w-full py-2 pl-4 pr-10 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                {% for participant in participants %}
+                    <option value="{{ participant.id }}">{{ participant.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="mt-4 w-full py-2 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600">Create Conversation</button>
+    </form>
+</div>
+{% endblock %}

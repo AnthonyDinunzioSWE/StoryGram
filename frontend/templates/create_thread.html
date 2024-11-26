@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Create Thread</h3>
+<form method="POST">
+    <input type="text" name="title" placeholder="Thread Title" required>
+    <textarea name="content" placeholder="Thread Content" required></textarea>
+    <button type="submit">Create Thread</button>
+</form>
+{% endblock %}
