@@ -5,6 +5,30 @@ import os
 from werkzeug.utils import secure_filename
 from datetime import datetime
 
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+import os
+
+
+# Flask INIT
+app = Flask(__name__,
+            template_folder=os.path.join(os.path.dirname(__file__), "../frontend/templates"),
+            static_folder=os.path.join(os.path.dirname(__file__), "../frontend/static")
+            )
+
+# App Configurations
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///storygram.db"
+app.config["DATABASE_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = "randomKey"
+
+# Database INIT
+db = SQLAlchemy(app)
+
+migrate = Migrate(app, db)
+
+
+
 ALLOWED_EXTENSIONS = ["png", "jpg"]
 UPLOAD_FOLDER = "static/uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -12,6 +36,156 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# DATABASE MODELS
+from config import db
+from datetime import datetime
+
+# User Table
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
+    profile_picture = db.Column(db.String(255), nullable=True)
+
+    posts = db.relationship('Post', backref='author', lazy=True)
+    threads = db.relationship('Thread', backref='author', lazy=True)
+    followers = db.relationship(
+        'User', 
+        secondary='followers', 
+        primaryjoin='User.id==followers.c.following_id',
+        secondaryjoin='User.id==followers.c.follower_id',
+        backref='following'
+    )
+    liked_posts = db.relationship(
+        'Post',
+        secondary='likes',
+        back_populates='liked_by_users'
+    )
+    conversations = db.relationship(
+        'Conversation',
+        secondary='conversation_users',
+        back_populates='users'
+    )
+
+# Post Table
+class Post(db.Model):
+    __tablename__ = 'posts'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    threads = db.relationship('Thread', backref='parent_post', lazy=True)
+    comments = db.relationship('Comment', backref='post', lazy=True)
+    likes = db.relationship(
+        'User',
+        secondary='likes',
+        back_populates='liked_posts'
+    )
+    dislikes = db.relationship(
+        'User',
+        secondary='dislikes',
+        back_populates='disliked_posts'
+    )
+
+# Thread Table
+class Thread(db.Model):
+    __tablename__ = 'threads'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(255), nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    comments = db.relationship('Comment', backref='thread', lazy=True)
+    likes = db.relationship(
+        'User',
+        secondary='thread_likes',
+        back_populates='liked_threads'
+    )
+    dislikes = db.relationship(
+        'User',
+        secondary='thread_dislikes',
+        back_populates='disliked_threads'
+    )
+
+# Comment Table
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=True)
+    thread_id = db.Column(db.Integer, db.ForeignKey('threads.id'), nullable=True)
+
+# Conversation Table
+class Conversation(db.Model):
+    __tablename__ = 'conversations'
+    id = db.Column(db.Integer, primary_key=True)
+    messages = db.relationship('Message', backref='conversation', lazy=True)
+    users = db.relationship(
+        'User',
+        secondary='conversation_users',
+        back_populates='conversations'
+    )
+
+# Message Table
+class Message(db.Model):
+    __tablename__ = 'messages'
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    conversation_id = db.Column(db.Integer, db.ForeignKey('conversations.id'), nullable=False)
+
+# Association Tables
+followers = db.Table(
+    'followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('following_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
+
+likes = db.Table(
+    'likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True)
+)
+
+dislikes = db.Table(
+    'dislikes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('post_id', db.Integer, db.ForeignKey('posts.id'), primary_key=True)
+)
+
+thread_likes = db.Table(
+    'thread_likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('thread_id', db.Integer, db.ForeignKey('threads.id'), primary_key=True)
+)
+
+thread_dislikes = db.Table(
+    'thread_dislikes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('thread_id', db.Integer, db.ForeignKey('threads.id'), primary_key=True)
+)
+
+conversation_users = db.Table(
+    'conversation_users',
+    db.Column('conversation_id', db.Integer, db.ForeignKey('conversations.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True)
+)
+
+
+# APP ROUTES
 @app.route("/")
 def home():
     if "user_id" not in session:
@@ -509,4 +683,4 @@ def select_participants():
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5002)
+    app.run(debug=True)
