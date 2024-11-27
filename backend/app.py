@@ -77,12 +77,12 @@ class Post(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     threads = db.relationship('Thread', backref='parent_post', lazy=True)
     comments = db.relationship('Comment', backref='post', lazy=True)
-    likes = db.relationship(
-        'User',
-        secondary='likes',
-        back_populates='liked_posts'
-    )
-    dislikes = db.relationship(
+    liked_by_users = db.relationship(
+    'User',
+    secondary='likes',
+    back_populates='liked_posts'
+)
+    disliked_by_users = db.relationship(
         'User',
         secondary='dislikes',
         back_populates='disliked_posts'
