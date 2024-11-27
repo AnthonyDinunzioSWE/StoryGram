@@ -19,7 +19,6 @@ app = Flask(__name__,
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///storygram.db"
 app.config["DATABASE_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "randomKey"
-port = process.env.port
 
 # Database INIT
 db = SQLAlchemy(app)
