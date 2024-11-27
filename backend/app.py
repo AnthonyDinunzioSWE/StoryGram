@@ -36,7 +36,6 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # DATABASE MODELS
-from datetime import datetime
 
 # User Table
 class User(db.Model):
